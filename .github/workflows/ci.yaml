@@ -64,10 +64,13 @@ jobs:
       image: ghcr.io/alandysson/ficker-front:latest
     # needs: tests
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Tag the image to publish
         run: docker tag ghcr.io/alandysson/ficker-front:latest us-central1-docker.pkg.dev/cinfo-devops-2023-2/docker/alan:latest
 
-      - name: Login to gcp
+      - name: Login into gcp
         uses: "google-github-actions/auth@v2"
         with:
           credentials_json: "${{ secrets.GOOGLE_CREDENTIALS }}"
