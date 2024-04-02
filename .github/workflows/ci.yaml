@@ -72,7 +72,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Tag the image to publish
-        run: docker tag $GHCR_ADDRESS:latest $GCP_ADDRESS:latest
+        run: docker tag $GHCR_ADDRESS:latest $GCP_ADDRESS:1.1
 
       - name: Login into gcp
         uses: "google-github-actions/auth@v2"
@@ -89,7 +89,7 @@ jobs:
 
       - name: Push the image to GCP
         run: |
-          docker push $GCP_ADDRESS:latest
+          docker push $GCP_ADDRESS:1.1
 
   # deploy-to-cloud-run:
   #   runs-on: ubuntu-latest
