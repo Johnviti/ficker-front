@@ -9,7 +9,7 @@ on:
 
 env:
   GCP_ADDRESS: us-central1-docker.pkg.dev/cinfo-devops-2023-2/docker/alan
-  GHCR_ADDRESS: ghcr.io/alandysson/ficker-front
+  GHCR_IMAGE: ghcr.io/alandysson/ficker-front:latest
 
 jobs:
   # build:
@@ -31,48 +31,48 @@ jobs:
   #       run: |
   #         docker buildx build -t ghcr.io/alandysson/ficker-front:latest --push .
 
-  # tests:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   services:
-  #     image: ghcr.io/alandysson/ficker-front:latest
+  tests:
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      image: $GHCR_IMAGE
 
-  #   steps:
-  #     - name: Run the image
-  #       run: |
-  #         docker run -d -p 3000:3000 ghcr.io/alandysson/ficker-front:latest --name ficker-front
-  #         sleep 5
+    steps:
+      - name: Run the image
+        run: |
+          docker run -d -p 3000:3000 $GHCR_IMAGE --name ficker-front
+          sleep 5
 
-  #     - name: Run tests
-  #       run: |
-  #         docker ps
-  #         docker exec $(docker ps -q) yarn test
-  #         docker exec $(docker ps -q) cat reports/jest-junit.xml | tee /tmp/jest-junit.xml
+      - name: Run tests
+        run: |
+          docker ps
+          docker exec $(docker ps -q) yarn test
+          docker exec $(docker ps -q) cat reports/jest-junit.xml | tee /tmp/jest-junit.xml
 
-  #     - name: Copy Test Results
-  #       if: always()
-  #       run: |
-  #         cp -Lpr /tmp/jest-junit.xml test-results.xml
-  #       shell: bash
+      - name: Copy Test Results
+        if: always()
+        run: |
+          cp -Lpr /tmp/jest-junit.xml test-results.xml
+        shell: bash
 
-  #     - name: Publish Test Results
-  #       uses: EnricoMi/publish-unit-test-result-action/linux@v2
-  #       if: always()
-  #       with:
-  #         files: |
-  #           test-results.xml
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/linux@v2
+        if: always()
+        with:
+          files: |
+            test-results.xml
 
   deploy-to-registry:
     runs-on: ubuntu-latest
     services:
-      image: ghcr.io/alandysson/ficker-front:latest
+      image: $GHCR_IMAGE
     # needs: tests
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Tag the image to publish
-        run: docker tag $GHCR_ADDRESS:latest $GCP_ADDRESS:1.1
+        run: docker tag $GHCR_IMAGE $GCP_ADDRESS:latest
 
       - name: Login into gcp
         uses: "google-github-actions/auth@v2"
@@ -89,7 +89,7 @@ jobs:
 
       - name: Push the image to GCP
         run: |
-          docker push $GCP_ADDRESS:1.1
+          docker push $GCP_ADDRESS:latest
 
   # deploy-to-cloud-run:
   #   runs-on: ubuntu-latest
