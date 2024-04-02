@@ -68,7 +68,7 @@ jobs:
       - name: Copy Test Results
         if: always()
         run: |
-          cp -Lpr /tmp/jest-junit.xml test-results
+          cp -Lpr /tmp/jest-junit.xml test-results.xml
         shell: bash
 
       - name: Publish Test Results
@@ -76,7 +76,7 @@ jobs:
         if: always()
         with:
           files: |
-            test-results/**/*.xml
+            test-results.xml
 
       # - name: Test Report
       #   uses: dorny/test-reporter@v1
