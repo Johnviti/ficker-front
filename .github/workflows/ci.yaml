@@ -73,7 +73,7 @@ jobs:
 
       - name: Tag the image to publish
         #use variables GHC_ADDRESS and GCP_ADDRESS
-        run: docker tag $GP_ADDRESS:latest $GHCR_ADDRESS:latest
+        run: echo "docker tag $GCP_ADDRESS:latest $GHCR_ADDRESS:latest"
 
       - name: Login into gcp
         uses: "google-github-actions/auth@v2"
@@ -86,11 +86,11 @@ jobs:
           version: ">= 363.0.0"
 
       - name: Use gcloud CLI
-        run: gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin $GP_ADDRESS
+        run: gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin $GCP_ADDRESS
 
       - name: Push the image to GCP
         run: |
-          docker push $GP_ADDRESS:latest
+          docker push $GCP_ADDRESS:latest
 
   # deploy-to-cloud-run:
   #   runs-on: ubuntu-latest
