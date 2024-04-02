@@ -6,8 +6,6 @@ on:
   push:
     branches:
       - main
-env:
-  testResult: ""
 
 jobs:
   # build:
@@ -60,18 +58,13 @@ jobs:
         run: |
           docker run -d -p 3000:3000 ghcr.io/alandysson/ficker-front:latest --name ficker-front
           sleep 5
+          ls -la
 
       - name: Run tests
         run: |
           docker ps
           docker exec $(docker ps -q) yarn test
           docker exec $(docker ps -q) cat reports/jest-junit.xml | tee /tmp/jest-junit.xml
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-results
-          path: /tmp/jest-junit.xml
 
       - name: Test Report
         uses: dorny/test-reporter@v1
@@ -81,8 +74,7 @@ jobs:
           name: JEST Tests # Name of the check run which will be created
           path: "*.xml" # Path to the test results
           reporter: jest-junit # Format of test results
-  # - name: Push image
-  #   run: docker buildx build -t ${{ env.GAR_LOCATION }} --push .
+
 
   # deploy:
   #   runs-on: ubuntu-latest
