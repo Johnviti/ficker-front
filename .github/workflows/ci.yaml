@@ -71,7 +71,7 @@ jobs:
           docker exec $(docker ps -q) cat reports/jest-junit.xml | tee /tmp/jest-junit.xml
 
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: /tmp/jest-junit.xml
