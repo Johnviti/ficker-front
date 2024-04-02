@@ -73,7 +73,7 @@ jobs:
 
       - name: Tag the image to publish
         #use variables GHC_ADDRESS and GCP_ADDRESS
-        run: echo "docker tag $GCP_ADDRESS:latest $GHCR_ADDRESS:latest"
+        run: docker tag $GCP_ADDRESS:latest $GHCR_ADDRESS:latest
 
       - name: Login into gcp
         uses: "google-github-actions/auth@v2"
