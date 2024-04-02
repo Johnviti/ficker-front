@@ -66,11 +66,19 @@ jobs:
           docker exec $(docker ps -q) yarn test
           docker exec $(docker ps -q) cat reports/jest-junit.xml | tee /tmp/jest-junit.xml
 
+      - name: Copy Test Results
+        if: always()
+        run: |
+          cp -Lpr /tmp/test-junit test-results
+        shell: bash
+
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action/linux@v2
         if: always()
         with:
-          files: /tmp/jest-junit.xml
+          files: |
+            test-results/**/*.xml
+
       # - name: Test Report
       #   uses: dorny/test-reporter@v1
       #   if: success() || failure() # run this step even if previous step failed
