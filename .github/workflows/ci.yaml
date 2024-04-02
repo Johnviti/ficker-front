@@ -33,7 +33,7 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
-    needs: build
+    # needs: build
     services:
       image: ghcr.io/alandysson/ficker-front:latest
 
