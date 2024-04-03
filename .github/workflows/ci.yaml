@@ -7,6 +7,10 @@ on:
     branches:
       - main
 
+env:
+  GCP_ADDRESS: us-central1-docker.pkg.dev/cinfo-devops-2023-2/docker/alan
+  GHCR_IMAGE: ghcr.io/alandysson/ficker-front:latest
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,8 +28,7 @@ jobs:
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build and push
-        run: |
-          docker buildx build -t ghcr.io/alandysson/ficker-front:latest --push .
+        run: docker buildx build -t ghcr.io/alandysson/ficker-front:latest --push .
 
   tests:
     runs-on: ubuntu-latest
@@ -36,12 +39,11 @@ jobs:
     steps:
       - name: Run the image
         run: |
-          docker run -d -p 3000:3000 ghcr.io/alandysson/ficker-front:latest --name ficker-front
+          docker run -d -p 3000:3000 $GHCR_IMAGE --name ficker-front
           sleep 5
 
       - name: Run tests
         run: |
-          docker ps
           docker exec $(docker ps -q) yarn test
           docker exec $(docker ps -q) cat reports/jest-junit.xml | tee /tmp/jest-junit.xml
 
@@ -60,21 +62,17 @@ jobs:
 
   deploy-to-registry:
     runs-on: ubuntu-latest
+    services:
+      image: ghcr.io/alandysson/ficker-front:latest
     needs: tests
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Login to GitHub Container Registry
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Pull ghcr image
-        run: docker pull ghcr.io/alandysson/ficker-front:latest
+        uses: actions/checkout@v4
 
       - name: Tag the image to publish
-        run: docker tag ghcr.io/alandysson/ficker-front:latest us-central1-docker.pkg.dev/cinfo-devops-2023-2/docker/alan:latest
+        run: docker tag $GHCR_IMAGE $GCP_ADDRESS:latest
 
-      - name: Login to gcp
+      - name: Login into gcp
         uses: "google-github-actions/auth@v2"
         with:
           credentials_json: "${{ secrets.GOOGLE_CREDENTIALS }}"
@@ -85,11 +83,10 @@ jobs:
           version: ">= 363.0.0"
 
       - name: Use gcloud CLI
-        run: gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin us-central1-docker.pkg.dev/cinfo-devops-2023-2/docker/alan
+        run: gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin $GCP_ADDRESS
 
       - name: Push the image to GCP
-        run: |
-          docker push us-central1-docker.pkg.dev/cinfo-devops-2023-2/docker/alan:latest
+        run: docker push $GCP_ADDRESS:latest
 
   deploy-to-cloud-run:
     runs-on: ubuntu-latest
@@ -110,4 +107,3 @@ jobs:
         with:
           service: "alan"
           image: "us-central1-docker.pkg.dev/cinfo-devops-2023-2/docker/alan:latest"
-          port: 3000
