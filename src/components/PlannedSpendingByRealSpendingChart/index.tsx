@@ -18,10 +18,8 @@ interface PlannedSpendingByRealSpendingChartProps {
 
 const PlannedSpendingByRealSpendingChart = ({ data }: PlannedSpendingByRealSpendingChartProps) => {
   return (
-    <ResponsiveContainer width={"100%"} height={200}>
+    <ResponsiveContainer width={"100%"} height={250}>
       <ComposedChart
-        width={900}
-        height={500}
         data={data}
         margin={{
           top: 20,

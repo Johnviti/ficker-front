@@ -43,7 +43,7 @@ const ExpensesByCategoryChart = () => {
         }
       );
       setData(transformInGraphInformations.filter((item: any) => item !== undefined));
-    } catch (error) {}
+    } catch (error) { }
   };
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({
@@ -69,8 +69,8 @@ const ExpensesByCategoryChart = () => {
   }, []);
   return (
     <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-      <ResponsiveContainer width={"100%"} height={200}>
-        <PieChart width={200} height={200}>
+      <ResponsiveContainer width={"100%"} height={250}>
+        <PieChart width={250} height={250}>
           <Pie
             data={data}
             cx="40%"

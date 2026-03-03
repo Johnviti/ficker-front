@@ -66,14 +66,13 @@ const Cards = () => {
         </Link>
       </div>
       <NewCardModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-      <div style={{ display: "flex", flexDirection: "row" }}>
+      <div style={{ display: "flex", flexDirection: "row", minHeight: "90vh", backgroundColor: "#f8f9fa" }}>
         <CustomMenu />
-        <div style={{ width: "90vw" }}>
+        <div style={{ flex: 1, padding: "30px 40px", overflowX: "hidden" }}>
           <div className={styles.titleArea}>
             <div>
-              <h3>{`Meus cartões ${
-                Object.keys(selectedCard).length > 0 ? "> " + selectedCard.card_description : ""
-              }`}</h3>
+              <h3>{`Meus cartões ${Object.keys(selectedCard).length > 0 ? "> " + selectedCard.card_description : ""
+                }`}</h3>
             </div>
             <div className={styles.buttonsArea}>
               <SearchField />
@@ -126,7 +125,7 @@ const Cards = () => {
                           <Row justify={"end"}>
                             <Col>
                               <Col>
-                                <Text type="secondary">Próxima fatura:</Text>
+                                <Text type="secondary">Vencimento:</Text>
                               </Col>
                               <Row justify={"end"}>
                                 <Col>

@@ -3,7 +3,7 @@ import type { MenuProps } from "antd";
 import { Menu } from "antd";
 import Image from "next/image";
 import "./styles.scss";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Cookies } from "react-cookie";
 import { BarsOutlined } from "@ant-design/icons";
 import useMediaQuery from "use-media-antd-query";
@@ -28,27 +28,27 @@ function getItem(
 
 const items: MenuItem[] = [
   getItem(
-    <Link href={"/"}>Início</Link>,
+    "Início",
     "1",
     <Image src="/despesas.svg" alt="Logo" width={25} height={25} />
   ),
   getItem(
-    <Link href={"/EnterTransaction"}>Entradas</Link>,
+    "Entradas",
     "2",
     <Image src="/bolsa-de-dinheiro.svg" alt="Logo" width={25} height={25} />
   ),
   getItem(
-    <Link href={"/Outputs"}>Saídas</Link>,
+    "Saídas",
     "3",
     <Image src="/wallet.svg" alt="Logo" width={25} height={25} />
   ),
   getItem(
-    <Link href={"/cards"}>Meus cartões</Link>,
+    "Meus cartões",
     "4",
     <Image src="/cartoes-de-credito.svg" alt="Logo" width={25} height={25} />
   ),
   getItem(
-    <Link href={"/analysis"}>Análises</Link>,
+    "Análises",
     "5",
     <Image src="/analise.svg" alt="Logo" width={25} height={25} />
   ),
@@ -60,15 +60,20 @@ const items: MenuItem[] = [
       alt="Logo"
       width={25}
       height={25}
-      onClick={() => {
-        localStorage.clear();
-        window.location.href = "/login";
-      }}
     />
   ),
 ];
 
+const paths: Record<string, string> = {
+  "1": "/",
+  "2": "/EnterTransaction",
+  "3": "/Outputs",
+  "4": "/cards",
+  "5": "/analysis",
+};
+
 const CustomMenu: React.FC = () => {
+  const router = useRouter();
   const cookie = new Cookies();
   const menu = cookie.get("menu");
   const colSize = useMediaQuery();
@@ -93,6 +98,8 @@ const CustomMenu: React.FC = () => {
               cookie.remove("menu");
               localStorage.clear();
               window.location.href = "/login";
+            } else if (paths[key as string]) {
+              router.push(paths[key as string]);
             }
           }}
         />

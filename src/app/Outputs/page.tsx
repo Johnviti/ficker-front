@@ -42,10 +42,10 @@ const Outputs = () => {
           <Image src="/logo.png" alt="Logo" width={130} height={27} />
         </Link>
       </div>
-      <div style={{ display: "flex", flexDirection: "row" }}>
+      <div style={{ display: "flex", flexDirection: "row", minHeight: "90vh", backgroundColor: "#f8f9fa" }}>
         <CustomMenu />
         <OutputModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-        <div style={{ width: "90vw" }}>
+        <div style={{ flex: 1, padding: "30px 40px", overflowX: "hidden" }}>
           <div className={styles.titleArea}>
             <div>
               <h3>Saídas</h3>
