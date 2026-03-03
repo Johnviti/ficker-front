@@ -40,7 +40,6 @@ export const EnterTransactionModal = ({ isModalOpen, setIsModalOpen }: EnterTran
           ...values,
           date: dayjs(values.date).format("YYYY-MM-DD"),
           type_id: 1,
-          payment_method_id: null,
         },
       });
       message.success("Transação adicionada com sucesso!");
@@ -168,6 +167,23 @@ export const EnterTransactionModal = ({ isModalOpen, setIsModalOpen }: EnterTran
             <Input className={styles.input} placeholder="R$" />
           </Form.Item>
         </Col>
+        {/* <Col style={{ marginBottom: 20 }} xl={15}>
+          <label>Metodo de pagamento</label>
+          <Form.Item
+            name="payment_method_id"
+            rules={[{ required: true, message: "Esse campo precisa ser preenchido!" }]}
+          >
+            <Select
+              className={styles.input}
+              style={{ width: 200, height: 40 }}
+              options={[
+                { value: 0, label: "Dinheiro" },
+                { value: 1, label: "Cartão de Crédito" },
+                { value: 2, label: "Cartão de Débito" },
+              ]}
+            />
+          </Form.Item>
+        </Col> */}
         <Row>
           <Button className={styles.modalButtonWhite} onClick={handleCancel}>
             Cancelar
