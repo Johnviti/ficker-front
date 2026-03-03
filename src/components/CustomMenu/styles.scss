@@ -1,9 +1,14 @@
 .ant-menu-item-selected {
   background-color: #6C5DD3 !important;
+  color: white !important;
 }
 
-.ant-menu-item-selected a {
+.ant-menu-item-selected  .ant-menu-title-content {
   color: white !important;
+}
+
+.ant-menu-item-selected  img {
+  filter: brightness(0) invert(1) !important;
 }
 
 :where(.css-dev-only-do-not-override-fpg3f5).ant-menu-light .ant-menu-item-selected, :where(.css-dev-only-do-not-override-fpg3f5).ant-menu-light>.ant-menu .ant-menu-item-selected {
@@ -12,7 +17,7 @@
 
 .burger-icon {
   margin: 5px;
-  display: none; 
+  display: none;
   color: #6C5DD3;
   flex-direction: column;
   cursor: pointer;
