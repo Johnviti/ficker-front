@@ -23,7 +23,7 @@ export const request = async ({
   params,
   loaderStateSetter,
 }: RequestParams) => {
-  const baseUrl = "back.ficker.tech/api";
+  const baseUrl = "ficker-api.cloud/api";
   const token = localStorage.getItem("token");
   const config: AxiosRequestConfig = {
     method,
