@@ -5,19 +5,19 @@ import Link from "next/link";
 import { useState } from "react";
 import { request } from "@/service/api";
 import { AxiosError } from "axios";
-import { message as msg } from "antd";
+import { message as msg, Alert } from "antd";
 
 const CreateAccountPage = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [error, setError] = useState<boolean>(false);
-  const [message, setMessage] = useState<string[]>([]);
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   const handleSubmit = async () => {
+    setErrors({});
     if (password !== confirmPassword) {
-      return setError(true);
+      return setErrors({ password_confirmation: ["As senhas precisam ser iguais"] });
     }
     try {
       const response = await request({
@@ -35,10 +35,24 @@ const CreateAccountPage = () => {
       return (window.location.href = "/");
     } catch (error) {
       if (error instanceof AxiosError) {
-        setMessage(Object.values(error.response?.data.errors));
+        setErrors(error.response?.data?.errors || {});
+      } else {
+        msg.error("Ops! Algo deu errado ao tentar se cadastrar.");
       }
     }
   };
+
+  const getErrorStyle = (fieldName: string) => {
+    return errors[fieldName] && errors[fieldName].length > 0
+      ? {
+        borderColor: "#ee4848",
+        boxShadow: "0 0 5px rgba(238, 72, 72, 0.5)",
+        backgroundColor: "#fff0f0",
+      }
+      : {};
+  };
+
+  const allErrors = Object.values(errors).flat();
 
   return (
     <div>
@@ -47,13 +61,28 @@ const CreateAccountPage = () => {
           <Image src="/logo.png" alt="Logo" width={130} height={27} />
         </Link>
       </div>
-      {message.length > 0 ? (
-        <div className={styles.errorContainer}>
-          {message.map((item) => (
-            <p style={{ color: "#ee4848" }}>{item}</p>
-          ))}
+
+      {allErrors.length > 0 && (
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 20, width: "100%" }}>
+          <div style={{ width: "100%", maxWidth: 450, padding: "0 20px" }}>
+            <Alert
+              message="Verifique os campos abaixo"
+              description={
+                <ul style={{ margin: 0, paddingLeft: 20 }}>
+                  {allErrors.map((err, idx) => (
+                    <li key={idx} style={{ color: "#cf1322" }}>{err}</li>
+                  ))}
+                </ul>
+              }
+              type="error"
+              showIcon
+              closable
+              onClose={() => setErrors({})}
+            />
+          </div>
         </div>
-      ) : null}
+      )}
+
       <div className={styles.container}>
         <form
           className={styles.form}
@@ -63,6 +92,7 @@ const CreateAccountPage = () => {
           }}
         >
           <h2 style={{ textAlign: "center" }}>Cadastrar</h2>
+
           <label htmlFor="name" style={{ marginBottom: 5 }}>
             Nome
           </label>
@@ -72,19 +102,47 @@ const CreateAccountPage = () => {
             required
             className={styles.input}
             value={name}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => {
+              setName(event.target.value);
+              setErrors((prev) => ({ ...prev, name: [] }));
+            }}
+            style={getErrorStyle("name")}
           />
+          {errors.name && errors.name.length > 0 && (
+            <div style={{ color: "#ee4848", fontSize: "12px", marginTop: "-15px", marginBottom: "15px" }}>
+              {errors.name.map((err, idx) => (
+                <span key={idx} style={{ display: "block" }}>
+                  {err}
+                </span>
+              ))}
+            </div>
+          )}
+
           <label htmlFor="email" style={{ marginBottom: 5 }}>
             Email
           </label>
           <input
-            type="text"
+            type="email"
             id="email"
             required
             className={styles.input}
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setErrors((prev) => ({ ...prev, email: [] }));
+            }}
+            style={getErrorStyle("email")}
           />
+          {errors.email && errors.email.length > 0 && (
+            <div style={{ color: "#ee4848", fontSize: "12px", marginTop: "-15px", marginBottom: "15px" }}>
+              {errors.email.map((err, idx) => (
+                <span key={idx} style={{ display: "block" }}>
+                  {err}
+                </span>
+              ))}
+            </div>
+          )}
+
           <label htmlFor="password" style={{ marginBottom: 5 }}>
             Senha
           </label>
@@ -94,8 +152,22 @@ const CreateAccountPage = () => {
             value={password}
             required
             className={styles.input}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              setErrors((prev) => ({ ...prev, password: [] }));
+            }}
+            style={getErrorStyle("password")}
           />
+          {errors.password && errors.password.length > 0 && (
+            <div style={{ color: "#ee4848", fontSize: "12px", marginTop: "-15px", marginBottom: "15px" }}>
+              {errors.password.map((err, idx) => (
+                <span key={idx} style={{ display: "block" }}>
+                  {err}
+                </span>
+              ))}
+            </div>
+          )}
+
           <label htmlFor="confirmPassword" style={{ marginBottom: 5 }}>
             Confirmar Senha
           </label>
@@ -105,9 +177,22 @@ const CreateAccountPage = () => {
             required
             value={confirmPassword}
             className={styles.input}
-            onChange={(event) => setConfirmPassword(event.target.value)}
+            onChange={(event) => {
+              setConfirmPassword(event.target.value);
+              setErrors((prev) => ({ ...prev, password_confirmation: [] }));
+            }}
+            style={getErrorStyle("password_confirmation")}
           />
-          {error ? <p style={{ color: "red" }}>*As senhas precisam ser iguais</p> : null}
+          {errors.password_confirmation && errors.password_confirmation.length > 0 && (
+            <div style={{ color: "#ee4848", fontSize: "12px", marginTop: "-15px", marginBottom: "15px" }}>
+              {errors.password_confirmation.map((err, idx) => (
+                <span key={idx} style={{ display: "block" }}>
+                  {err}
+                </span>
+              ))}
+            </div>
+          )}
+
           <div
             style={{
               display: "flex",

@@ -4,7 +4,7 @@ import styles from "./login.module.scss";
 import Image from "next/image";
 import { request } from "@/service/api";
 import Link from "next/link";
-import { message } from "antd";
+import { Alert } from "antd";
 import MainContext from "@/context";
 
 export default function Login() {
@@ -12,7 +12,12 @@ export default function Login() {
   const [password, setPassword] = useState<string>("");
   const { setAuth } = useContext(MainContext);
 
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [globalError, setGlobalError] = useState<string>("");
+
   const handleSubmit = async () => {
+    setErrors({});
+    setGlobalError("");
     try {
       const response = await request({
         method: "POST",
@@ -22,15 +27,35 @@ export default function Login() {
           password: password,
         },
       });
-      if (response!.status === 200) {
+      if (response && response.status === 200) {
         setAuth(true);
-        localStorage.setItem("token", response!.data.data.token);
+        localStorage.setItem("token", response.data.data.token);
         return (window.location.href = "/");
       }
-    } catch (error) {
-      message.error("Senha ou email incorreto!");
+    } catch (error: any) {
+      if (error?.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        setGlobalError("Senha ou email incorreto!");
+      }
     }
   };
+
+  const getErrorStyle = (fieldName: string) => {
+    const hasFieldError = errors[fieldName] && errors[fieldName].length > 0;
+    if (hasFieldError || globalError) {
+      return {
+        borderColor: "#ee4848",
+        boxShadow: "0 0 5px rgba(238, 72, 72, 0.5)",
+        backgroundColor: "#fff0f0",
+      };
+    }
+    return {};
+  };
+
+  const allErrors = Object.values(errors).flat();
+  const displayErrors = globalError ? [globalError] : allErrors;
+
   return (
     <div>
       <div style={{ background: "#fff", padding: 10, alignItems: "center" }}>
@@ -38,6 +63,31 @@ export default function Login() {
           <Image src="/logo.png" alt="Logo" width={130} height={27} />
         </Link>
       </div>
+
+      {displayErrors.length > 0 && (
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 20, width: "100%" }}>
+          <div style={{ width: "100%", maxWidth: 450, padding: "0 20px" }}>
+            <Alert
+              message="Ocorreu um erro"
+              description={
+                <ul style={{ margin: 0, paddingLeft: displayErrors.length > 1 ? 20 : 0, listStyle: displayErrors.length > 1 ? "disc" : "none" }}>
+                  {displayErrors.map((err, idx) => (
+                    <li key={idx} style={{ color: "#cf1322" }}>{err}</li>
+                  ))}
+                </ul>
+              }
+              type="error"
+              showIcon
+              closable
+              onClose={() => {
+                setErrors({});
+                setGlobalError("");
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className={styles.container}>
         <form
           className={styles.form}
@@ -56,8 +106,23 @@ export default function Login() {
             required
             className={styles.input}
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setErrors((prev) => ({ ...prev, email: [] }));
+              setGlobalError("");
+            }}
+            style={getErrorStyle("email")}
           />
+          {errors.email && errors.email.length > 0 && (
+            <div style={{ color: "#ee4848", fontSize: "12px", marginTop: "-15px", marginBottom: "15px" }}>
+              {errors.email.map((err, idx) => (
+                <span key={idx} style={{ display: "block" }}>
+                  {err}
+                </span>
+              ))}
+            </div>
+          )}
+
           <label htmlFor="password" style={{ marginBottom: 5 }}>
             Senha
           </label>
@@ -67,8 +132,23 @@ export default function Login() {
             required
             className={styles.input}
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              setErrors((prev) => ({ ...prev, password: [] }));
+              setGlobalError("");
+            }}
+            style={getErrorStyle("password")}
           />
+          {errors.password && errors.password.length > 0 && (
+            <div style={{ color: "#ee4848", fontSize: "12px", marginTop: "-15px", marginBottom: "15px" }}>
+              {errors.password.map((err, idx) => (
+                <span key={idx} style={{ display: "block" }}>
+                  {err}
+                </span>
+              ))}
+            </div>
+          )}
+
           <div style={{ display: "flex", justifyContent: "center" }}>
             <button type="submit" className={styles.button}>
               Entrar
