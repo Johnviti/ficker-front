@@ -59,10 +59,10 @@ const Analysis = () => {
   };
 
   const formatCurrency = (value: any) => {
-    if (!value) {
+    if (value === null || value === undefined) {
       return null;
     }
-    const formattedValue = parseFloat(value).toLocaleString("pt-BR", {
+    const formattedValue = parseFloat(value || 0).toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
     });
@@ -105,7 +105,7 @@ const Analysis = () => {
                 <Col xs={24} sm={12} lg={6} style={{ display: "flex", flexDirection: "column" }}>
                   <div className={styles.balance} style={{ flex: 1, boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.03)" }}>
                     <p className={styles.balance_description}>Transação Mais Cara</p>
-                    <p className={styles.balance_title}>{formatCurrency(transactions?.mostExpensive)}</p>
+                    <p className={styles.balance_title}>{formatCurrency(transactions?.mostExpensive || 0)}</p>
                   </div>
                 </Col>
                 <Col xs={24} sm={12} lg={6} style={{ display: "flex", flexDirection: "column" }}>
