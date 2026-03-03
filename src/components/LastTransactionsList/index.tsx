@@ -1,8 +1,9 @@
-import { Image } from "antd";
+import { Image, Empty, Button } from "antd";
 import "./styles.scss";
 import { useEffect, useState } from "react";
 import { ITransaction } from "@/interfaces";
 import { request } from "@/service/api";
+import Link from "next/link";
 
 const LastTransactionsList = () => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
@@ -60,9 +61,15 @@ const LastTransactionsList = () => {
             </div>
           ))
         ) : (
-          <p style={{ color: "#80818191", fontSize: "small", textAlign: "center" }}>
-            Nenhuma transação encontrada.
-          </p>
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="Nenhuma transação encontrada."
+            style={{ margin: "20px 0" }}
+          >
+            <Link href="/EnterTransaction">
+              <Button type="primary">Registrar Transação</Button>
+            </Link>
+          </Empty>
         )}
       </div>
     </div>

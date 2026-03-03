@@ -2,6 +2,7 @@ import "./styles.scss";
 import { useEffect, useState } from "react";
 import { request } from "@/service/api";
 import { ModalNewCategory } from "../ModalNewCategory";
+import { Empty, Button } from "antd";
 
 interface AmountByCategory {
   category_description: string;
@@ -65,11 +66,17 @@ const MyCategoriesList = () => {
       </div>
       <ModalNewCategory isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       <div className="categories-area">
-        {categories?.map((category, index) => (
-          <>
-            {category.category_spending === 0 ? (
-              <p key={index}></p>
-            ) : (
+        {categories?.length === 0 || !categories?.some((c) => c.category_spending > 0) ? (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="Nenhuma categoria adicionada ou com gastos."
+            style={{ margin: "20px 0" }}
+          >
+            <Button type="primary" onClick={showModal}>Adicionar Categoria</Button>
+          </Empty>
+        ) : (
+          categories?.map((category, index) =>
+            category.category_spending === 0 ? null : (
               <div className="category-area" key={index}>
                 <div className="category-area__infos">
                   <span
@@ -82,9 +89,9 @@ const MyCategoriesList = () => {
                 </div>
                 <div className="category-area__value">{formatCurrency(category.category_spending)}</div>
               </div>
-            )}
-          </>
-        ))}
+            )
+          )
+        )}
       </div>
     </div>
   );
